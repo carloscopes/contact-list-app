@@ -10,7 +10,7 @@ export const Demo = () => {
 
 	return (
 		<div className="container">
-			<ul className="list-group">
+			<ul className="list-group flex">
 				{store.demo.map((item, index) => {
 					return (
 						<li

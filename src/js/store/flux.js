@@ -1,43 +1,88 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			contacts: [
+				
+			  ]
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+			loadContacts: async () => {
+				try {
+					let response = await fetch('https://playground.4geeks.com/apis/fake/contact/agenda/Carlos Corona')
+					let data = await response.json()
+					setStore({contacts:data})
+				} catch (error) {
+					console.log(error);	
+				}
 			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
+			addContact: async (newContact) => {
+				try {
+					let response = await fetch('https://playground.4geeks.com/apis/fake/contact/',
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify(
+							{
+								"full_name": newContact.fullName,
+								"email": newContact.email,
+								"agenda_slug": "Carlos Corona",
+								"address": newContact.address,
+								"phone":newContact.phone,
+							}
+						)
+					});
+					if (response.ok){
+						getActions().loadContacts()
+					}
+				} catch (error) {
+					console.log(error);
+				}
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
-			}
+			deleteContact: async (id) => {
+				try {
+					let response = await fetch(`https://playground.4geeks.com/apis/fake/contact/${id}`,
+					{
+						method: "DELETE",
+						headers: {
+							"Content-Type": "application/json"
+						},						
+					});
+					if (response.ok){
+						getActions().loadContacts()
+					}
+				} catch (error) {
+					console.log(error);
+				}
+				
+	
+			},
+			editContact: async newContact => {
+				try {
+				  const response = await fetch(
+					`https://playground.4geeks.com/apis/fake/contact/${newContact.id}`,
+					{
+					  method: "PUT",
+					  headers: { "Content-Type": "application/json" },
+					  body: JSON.stringify({
+						full_name: newContact.full_name,
+						email: newContact.email,
+						agenda_slug: "Carlos Corona",
+						address: newContact.address,
+						phone: newContact.phone
+					  })
+					}
+				  );
+				  if (response.ok) {
+					const data = await response.json();
+					console.log(data);
+					getActions().loadContacts();
+				  }
+				} catch (error) {
+				  console.log(error);
+				}
+			  },
 		}
 	};
 };
